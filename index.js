@@ -48,22 +48,56 @@ server.get('/api/users', (req, res) => {
 // GET by id
 server.get('/api/users/:id', (req, res) => {
     const { id } = req.params
-db.findById(id)
-    .then(foundUser => {
-        if(foundUser) {
-            res.json(foundUser)
-        } else {
-            res.status(404).json({
-                message: 'The user with the specified ID does not exisit.'
-            })
-        }
-    })
+    db.findById(id)
+        .then(foundUser => {
+            if(foundUser) {
+                res.json(foundUser)
+            } else {
+                res.status(404).json({
+                    message: 'The user with the specified ID does not exist.'
+                })
+            }
+        })
     .catch(err => {
         res.status(500).json({
             error: 'The user information could not be retreived'
         })
     })
 })
+
+// DELETE
+server.delete('/api/users/:id', (req, res) => {
+    const { id } = req.params
+    db.remove(id)
+        .then(deletedUser => {
+            if(deletedUser) {
+                let newList = []
+                db.find()
+                    .then(userList => {
+                        newList = userList
+                        res.status(200).json(newList)
+                    })
+                    .catch(err => {
+                        res.status(500).json({
+                            error: "The user was deleted but there was error while retreiving the new user list"
+                        })
+                    })
+                                    
+            } else {
+                res.status(404).json({
+                    message: 'The user with the specified ID does not exist'
+                })
+            }
+        })
+        .catch(err => {
+            res.status(500).json({
+                error: "The user information could not be deleted"
+            })
+        })
+})
+
+// PUT
+
 
 
 
